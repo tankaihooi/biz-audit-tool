@@ -28,7 +28,7 @@ codebase — always go through the interface.
 - Backend: FastAPI + Pydantic (all I/O validated by Pydantic models)
 - Vectors: ChromaDB (persistent), embeddings via sentence-transformers
 - Frontend: Streamlit (calls the FastAPI endpoint over HTTP; no logic in the UI)
-- API baseline model: read the key from env, never hardcode
+- LLM: Gemini API (`google-genai`), key read from env, never hardcoded
 
 ## Conventions
 - Structured output is the `Recommendation` Pydantic model in `backend/llm/schema.py`.
@@ -41,7 +41,7 @@ codebase — always go through the interface.
 ## Build order (current status)
 1. [x] Walking skeleton: Streamlit -> FastAPI -> hardcoded Recommendation (StubEngine)
 2. [x] RAG: ingest/chunk case studies, embed, ChromaDB, test retrieval
-3. [ ] ApiEngine: real API model with retrieved context, forced structured output
+3. [x] ApiEngine: real API model with retrieved context, forced structured output
 4. [ ] Benchmark: RAG vs no-RAG on a 20-case rubric
 5. [ ] Deploy on Hugging Face Spaces; handle edge cases (empty/very short/non-business input)
 

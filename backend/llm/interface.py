@@ -7,7 +7,19 @@ implementations. This is what makes the benchmark a for-loop.
 import os
 from abc import ABC, abstractmethod
 
+from google import genai
+from google.genai import types
+
 from .schema import Recommendation, Bottleneck, Difficulty
+
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+
+SYSTEM_INSTRUCTION = """\
+You are a business process automation consultant. A small or medium-sized \
+business owner describes one of their workflows in plain language. Identify \
+the concrete bottlenecks in that workflow and, for each one, recommend \
+specific AI tools that would fix it (not generic advice like "use AI more"), \
+a realistic estimate of time saved, and how hard it would be to implement."""
 
 
 class RecommendationEngine(ABC):
@@ -43,21 +55,38 @@ class StubEngine(RecommendationEngine):
 
 
 class ApiEngine(RecommendationEngine):
-    """A frontier API model, optionally prompted with retrieved context.
+    """Gemini API model, optionally prompted with retrieved context.
 
     Set use_rag=False to benchmark the model against its own RAG-augmented
     output (the 'no-RAG' baseline).
-
-    TODO(step 3): call the API, force JSON matching the Recommendation schema,
-    validate with Recommendation.model_validate_json before returning.
     """
 
-    def __init__(self, use_rag: bool = True) -> None:
-        self.api_key = os.environ["LLM_API_KEY"]
+    def __init__(self, use_rag: bool = True, model: str | None = None) -> None:
+        self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+        self.model = model or os.getenv("GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
         self.use_rag = use_rag
 
     def generate(self, query: str, context: list[str]) -> Recommendation:
-        raise NotImplementedError("Implement in step 3.")
+        prompt = self._build_prompt(query, context if self.use_rag else [])
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION,
+                response_mime_type="application/json",
+                response_schema=Recommendation,
+            ),
+        )
+        # The API is prompted for schema-shaped JSON, but LLMs occasionally
+        # break the contract — always validate before returning.
+        return Recommendation.model_validate_json(response.text)
+
+    def _build_prompt(self, query: str, context: list[str]) -> str:
+        parts = [f"Workflow description:\n{query}"]
+        if context:
+            case_studies = "\n\n---\n\n".join(context)
+            parts.append(f"Similar automation case studies for reference:\n{case_studies}")
+        return "\n\n".join(parts)
 
 
 def get_engine(name: str | None = None) -> RecommendationEngine:
