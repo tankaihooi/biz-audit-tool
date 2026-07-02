@@ -13,6 +13,7 @@ RUN python -m scripts.ingest
 RUN chmod +x start.sh
 
 ENV BACKEND_URL=http://127.0.0.1:8000
+ENV ENGINE=api
 EXPOSE 7860
 
 CMD ["./start.sh"]
