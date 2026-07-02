@@ -43,7 +43,8 @@ codebase — always go through the interface.
 2. [x] RAG: ingest/chunk case studies, embed, ChromaDB, test retrieval
 3. [x] ApiEngine: real API model with retrieved context, forced structured output
 4. [ ] Benchmark: RAG vs no-RAG on a 20-case rubric
-5. [ ] Deploy: Hugging Face Space (Docker SDK, backend + frontend in one container)
+5. [x] Deploy: Hugging Face Space (Docker SDK, backend + frontend in one container)
+   Live: https://huggingface.co/spaces/tankaihooi/biz-audit-tool
 6. [ ] Handle edge cases (empty/very short/non-business input)
 
 ## Commands

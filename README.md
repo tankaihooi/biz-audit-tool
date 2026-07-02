@@ -18,7 +18,8 @@ implementation-difficulty rating. Built on a RAG-augmented LLM pipeline.
 > production deployment.
 
 ## Demo
-<!-- TODO: screenshot or GIF of the UI, and the live Hugging Face Spaces link -->
+**Live:** https://huggingface.co/spaces/tankaihooi/biz-audit-tool
+<!-- TODO: screenshot or GIF of the UI -->
 
 ## Architecture
 ```
