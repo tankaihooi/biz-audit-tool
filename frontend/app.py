@@ -52,7 +52,9 @@ if st.button("Audit workflow", type="primary"):
     st.subheader("Bottlenecks & recommendations")
     for i, b in enumerate(data["bottlenecks"], 1):
         with st.expander(f"{i}. {b['description']}", expanded=True):
-            st.markdown(f"**AI tools:** {', '.join(b['ai_tools'])}")
+            st.markdown("**AI tools:**")
+            for tool in b["ai_tools"]:
+                st.markdown(f"- {tool}")
             col1, col2 = st.columns(2)
             col1.metric("Est. time saved", b["estimated_time_saved"])
 
