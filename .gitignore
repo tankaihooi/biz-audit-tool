@@ -1,8 +1,6 @@
 # Secrets
 .env
 *.key
-.streamlit/secrets.toml
-frontend/.streamlit/secrets.toml
 
 # Python
 __pycache__/

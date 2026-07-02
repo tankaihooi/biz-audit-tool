@@ -1,3 +1,13 @@
+---
+title: Business Process Audit Tool
+emoji: 🔍
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Business Process Audit Tool
 
 An SME owner describes their business workflow; the tool returns identified
@@ -8,7 +18,7 @@ implementation-difficulty rating. Built on a RAG-augmented LLM pipeline.
 > production deployment.
 
 ## Demo
-<!-- TODO: screenshot or GIF of the UI, and the live Streamlit Community Cloud link -->
+<!-- TODO: screenshot or GIF of the UI, and the live Hugging Face Spaces link -->
 
 ## Architecture
 ```
@@ -32,18 +42,17 @@ streamlit run frontend/app.py                    # terminal 2
 ```
 
 ## Deployment
-Backend and frontend deploy separately and talk over HTTP, same as locally:
+Single [Hugging Face Space](https://huggingface.co/spaces) (Docker SDK). The
+`Dockerfile` builds the Chroma index at image-build time (Spaces disk isn't
+persistent) and `start.sh` runs both processes in one container: FastAPI
+backend bound to `127.0.0.1:8000` internally, Streamlit frontend on the
+exposed `0.0.0.0:7860`, talking to each other over `BACKEND_URL` exactly like
+local dev.
 
-- **Backend** — [Render](https://render.com), driven by `render.yaml`. Connect
-  this repo as a Blueprint, set the `GEMINI_API_KEY` secret in the Render
-  dashboard (not stored in the repo), and it builds the Chroma index and starts
-  the API automatically. Free tier: spins down after 15 min idle, ~60s cold
-  start on the next request.
-- **Frontend** — [Streamlit Community Cloud](https://share.streamlit.io).
-  Deploy from this repo with main file `frontend/app.py`; it picks up
-  `frontend/requirements.txt` automatically (lightweight — no torch/chromadb).
-  Add a `BACKEND_URL` secret pointing at the deployed Render service (see
-  `frontend/.streamlit/secrets.toml.example`).
+To deploy: create a Space with the Docker SDK, push this repo to it, and set
+`GEMINI_API_KEY` as a Space secret (Settings → Repository secrets — not
+stored in the repo). The README frontmatter above (`sdk: docker`,
+`app_port: 7860`) is Hugging Face's required Space config.
 
 ## Benchmark results
 Same Gemini 2.5 Flash model, no RAG vs RAG-augmented, scored by an LLM judge
