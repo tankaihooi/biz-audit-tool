@@ -1,0 +1,81 @@
+"""Every model variant lives behind this one interface.
+
+Vanilla API, fine-tuned, and fine-tuned+RAG are all just RecommendationEngine
+implementations. This is what makes the Week-4 benchmark a for-loop.
+"""
+
+import os
+from abc import ABC, abstractmethod
+
+from .schema import Recommendation, Bottleneck, Difficulty
+
+
+class RecommendationEngine(ABC):
+    """Contract for anything that turns a workflow + context into a Recommendation."""
+
+    @abstractmethod
+    def generate(self, query: str, context: list[str]) -> Recommendation:
+        """query = workflow description; context = retrieved case-study chunks."""
+        ...
+
+
+class StubEngine(RecommendationEngine):
+    """Hardcoded output. Used for the walking skeleton and as a fast UI/test fixture."""
+
+    def generate(self, query: str, context: list[str]) -> Recommendation:
+        return Recommendation(
+            summary="Manual, repetitive steps dominate this workflow.",
+            bottlenecks=[
+                Bottleneck(
+                    description="Staff manually copy order data between email and the ERP.",
+                    ai_tools=["Document AI / OCR", "RPA (Power Automate)"],
+                    estimated_time_saved="5-8 hours/week",
+                    implementation_difficulty=Difficulty.medium,
+                ),
+                Bottleneck(
+                    description="Customer queries are answered ad hoc with no triage.",
+                    ai_tools=["LLM support assistant with RAG over past tickets"],
+                    estimated_time_saved="3-4 hours/week",
+                    implementation_difficulty=Difficulty.low,
+                ),
+            ],
+        )
+
+
+class ApiEngine(RecommendationEngine):
+    """Baseline: a frontier API model prompted with retrieved context.
+
+    TODO(step 3): call the API, force JSON matching the Recommendation schema,
+    validate with Recommendation.model_validate_json before returning.
+    """
+
+    def __init__(self) -> None:
+        self.api_key = os.environ["LLM_API_KEY"]
+
+    def generate(self, query: str, context: list[str]) -> Recommendation:
+        raise NotImplementedError("Implement in step 3.")
+
+
+class FinetunedEngine(RecommendationEngine):
+    """QLoRA fine-tuned model loaded locally (or served).
+
+    TODO(step 4): load base model + LoRA adapter, run inference, parse to schema.
+    Set use_rag=True to prepend retrieved context (the 'fine-tuned + RAG' variant).
+    """
+
+    def __init__(self, use_rag: bool = False) -> None:
+        self.use_rag = use_rag
+
+    def generate(self, query: str, context: list[str]) -> Recommendation:
+        raise NotImplementedError("Implement in step 4.")
+
+
+def get_engine(name: str | None = None) -> RecommendationEngine:
+    """Factory driven by the ENGINE env var (or an explicit name for benchmarking)."""
+    name = name or os.getenv("ENGINE", "stub")
+    return {
+        "stub": StubEngine,
+        "api": ApiEngine,
+        "finetuned": lambda: FinetunedEngine(use_rag=False),
+        "finetuned_rag": lambda: FinetunedEngine(use_rag=True),
+    }[name]()

@@ -1,0 +1,17 @@
+# --- App runtime ---
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-dotenv>=1.0
+
+# --- Frontend ---
+streamlit>=1.35
+requests>=2.32
+
+# --- RAG ---
+chromadb>=0.5
+sentence-transformers>=3.0
+
+# NOTE: fine-tuning deps (transformers, peft, bitsandbytes, trl, accelerate)
+# are NOT here on purpose. Install those in the Kaggle notebook environment only,
+# so this app image stays small and deployable on Hugging Face Spaces.
