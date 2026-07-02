@@ -43,12 +43,21 @@ codebase — always go through the interface.
 2. [x] RAG: ingest/chunk case studies, embed, ChromaDB, test retrieval
 3. [x] ApiEngine: real API model with retrieved context, forced structured output
 4. [ ] Benchmark: RAG vs no-RAG on a 20-case rubric
-5. [ ] Deploy on Hugging Face Spaces; handle edge cases (empty/very short/non-business input)
+5. [x] Deploy: FastAPI backend on Render, Streamlit frontend on Streamlit Community Cloud
+6. [ ] Handle edge cases (empty/very short/non-business input)
 
 ## Commands
 - Backend:  `uvicorn backend.main:app --reload --port 8000`
 - Frontend: `streamlit run frontend/app.py`
 - Install:  `pip install -r requirements.txt`
+
+## Deployment
+- Backend: Render web service, driven by `render.yaml` (builds `chroma_db` from
+  `data/processed/` at build time — Render's free-tier disk is ephemeral across
+  deploys, so the index must be rebuilt on every deploy, not committed).
+- Frontend: Streamlit Community Cloud, main file `frontend/app.py`. Reads its own
+  `frontend/requirements.txt` (lightweight — no torch/chromadb) and a `BACKEND_URL`
+  secret pointing at the Render service.
 
 ## Gotchas to watch
 - Normalize embeddings and match the distance metric to how vectors were created,

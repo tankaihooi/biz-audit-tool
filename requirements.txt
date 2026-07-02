@@ -9,6 +9,9 @@ streamlit>=1.35
 requests>=2.32
 
 # --- RAG ---
+# CPU-only torch wheels are a fraction of the size of the default CUDA build -
+# keeps builds fast and fits free-tier deploy resource limits.
+--extra-index-url https://download.pytorch.org/whl/cpu
 chromadb>=0.5
 sentence-transformers>=3.0
 

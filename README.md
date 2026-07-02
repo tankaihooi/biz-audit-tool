@@ -8,7 +8,7 @@ implementation-difficulty rating. Built on a RAG-augmented LLM pipeline.
 > production deployment.
 
 ## Demo
-<!-- TODO: screenshot or GIF of the UI, and the live Hugging Face Spaces link -->
+<!-- TODO: screenshot or GIF of the UI, and the live Streamlit Community Cloud link -->
 
 ## Architecture
 ```
@@ -30,6 +30,20 @@ cp .env.example .env          # fill in GEMINI_API_KEY; ENGINE=stub works with n
 uvicorn backend.main:app --reload --port 8000   # terminal 1
 streamlit run frontend/app.py                    # terminal 2
 ```
+
+## Deployment
+Backend and frontend deploy separately and talk over HTTP, same as locally:
+
+- **Backend** — [Render](https://render.com), driven by `render.yaml`. Connect
+  this repo as a Blueprint, set the `GEMINI_API_KEY` secret in the Render
+  dashboard (not stored in the repo), and it builds the Chroma index and starts
+  the API automatically. Free tier: spins down after 15 min idle, ~60s cold
+  start on the next request.
+- **Frontend** — [Streamlit Community Cloud](https://share.streamlit.io).
+  Deploy from this repo with main file `frontend/app.py`; it picks up
+  `frontend/requirements.txt` automatically (lightweight — no torch/chromadb).
+  Add a `BACKEND_URL` secret pointing at the deployed Render service (see
+  `frontend/.streamlit/secrets.toml.example`).
 
 ## Benchmark results
 Same Gemini 2.5 Flash model, no RAG vs RAG-augmented, scored by an LLM judge

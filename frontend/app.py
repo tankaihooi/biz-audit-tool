@@ -8,7 +8,11 @@ import os
 import requests
 import streamlit as st
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+try:
+    BACKEND_URL = st.secrets["BACKEND_URL"]
+except Exception:
+    # No secrets.toml locally (only present on Streamlit Community Cloud)
+    BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="Business Process Audit Tool", page_icon="🔍")
 st.title("Business Process Audit Tool")

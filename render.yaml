@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: biz-audit-tool-backend
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python -m scripts.ingest"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENGINE
+        value: api
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_API_KEY
+        sync: false

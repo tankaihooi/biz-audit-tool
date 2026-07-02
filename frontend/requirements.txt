@@ -1,0 +1,4 @@
+# Streamlit Community Cloud reads this instead of the root requirements.txt
+# since it's the frontend and doesn't need RAG/LLM deps. Keep it lightweight.
+streamlit>=1.35
+requests>=2.32
