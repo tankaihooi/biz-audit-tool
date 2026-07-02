@@ -1,0 +1,102 @@
+[
+  {
+    "id": "invoice-reentry",
+    "industry": "Accounting",
+    "workflow_description": "Our two-person bookkeeping team receives supplier invoices by email as PDF attachments. Someone has to open each one, read the line items, and manually type them into our QuickBooks account. We process about 60 invoices a week and it eats up almost a full day."
+  },
+  {
+    "id": "onboarding-paperwork",
+    "industry": "Professional services",
+    "workflow_description": "Every time we hire a new consultant, HR has to manually create their email account, request a laptop from IT, add them to payroll, and email the hiring manager once everything is set up. It takes about a week end-to-end and nothing is tracked centrally."
+  },
+  {
+    "id": "support-faq",
+    "industry": "E-commerce",
+    "workflow_description": "Our two customer support agents answer the same handful of questions all day - where's my order, how do I return something, do you ship internationally. They're buried in email and can't get to genuinely complicated tickets."
+  },
+  {
+    "id": "travel-coordination",
+    "industry": "Travel agency",
+    "workflow_description": "Travel agents have to check government websites and call embassies to confirm visa and vaccination requirements for every international booking before they can confirm a trip with a client. Requirements change often and this eats hours per booking."
+  },
+  {
+    "id": "clinic-scheduling",
+    "industry": "Healthcare",
+    "workflow_description": "Our clinic's front desk manually calls patients to confirm appointments the day before, and reschedules by hand in a paper diary when people cancel. No-shows are common because reminders are inconsistent."
+  },
+  {
+    "id": "audit-checklists",
+    "industry": "Internal audit",
+    "workflow_description": "Each regional office in our company runs internal audits using its own spreadsheet template and its own checklist, so results aren't comparable across regions and head office has to manually reconcile everything at quarter-end."
+  },
+  {
+    "id": "recruiting-screening",
+    "industry": "Recruiting",
+    "workflow_description": "We get around 200 applications per open role and a recruiter reads every resume by hand to shortlist five to interview. It takes days and good candidates sometimes get missed because of the volume."
+  },
+  {
+    "id": "claims-processing",
+    "industry": "Insurance",
+    "workflow_description": "Claims adjusters manually re-key information from submitted claim forms and supporting documents into our claims system, then cross-check it against policy documents before approving or denying a claim."
+  },
+  {
+    "id": "restaurant-reservations",
+    "industry": "Hospitality",
+    "workflow_description": "Our restaurant takes reservations over the phone and writes them into a paper book. On busy nights the host has to flip through pages to check availability, and double-bookings happen a few times a month."
+  },
+  {
+    "id": "contract-review",
+    "industry": "Legal",
+    "workflow_description": "Associates at our small law firm read every incoming vendor contract line by line to flag non-standard clauses before a partner reviews it. A typical contract takes an associate 45 minutes to an hour to review."
+  },
+  {
+    "id": "field-service-scheduling",
+    "industry": "Field services",
+    "workflow_description": "Our dispatcher manually assigns technicians to service calls based on who's closest and who has the right skills, using a whiteboard and phone calls. Techs often end up driving across town instead of to the nearest job."
+  },
+  {
+    "id": "donor-management",
+    "industry": "Nonprofit",
+    "workflow_description": "Our small nonprofit tracks donors and grant applications in a shared spreadsheet. Different staff update it inconsistently, so we don't have a reliable picture of who's given what or when to follow up with a lapsed donor."
+  },
+  {
+    "id": "helpdesk-triage",
+    "industry": "IT services",
+    "workflow_description": "New support tickets land in a shared inbox and someone has to read each one, figure out which category it belongs to, and manually assign it to the right technician. Urgent issues sometimes sit for hours before anyone notices."
+  },
+  {
+    "id": "citizen-engagement",
+    "industry": "Local government",
+    "workflow_description": "Residents email or call our city office with questions about permits, waste collection schedules, and local services. Staff spend a lot of time answering the same repetitive questions instead of handling complex resident issues."
+  },
+  {
+    "id": "translation-support",
+    "industry": "Banking",
+    "workflow_description": "Branch staff sometimes struggle to serve customers who don't speak English well, and we don't have interpreters on-site at every branch, so some customers leave without getting the help they needed."
+  },
+  {
+    "id": "bakery-ordering",
+    "industry": "Bakery (small retail)",
+    "workflow_description": "I run a small bakery and every evening I have to guess how much flour, butter, and eggs to order for the next day based on gut feeling. I either run out of stock mid-morning or throw away unsold bread at closing."
+  },
+  {
+    "id": "gym-scheduling",
+    "industry": "Fitness studio",
+    "workflow_description": "Members book classes through a paper sign-up sheet taped to the studio wall. I have to manually count sign-ups before each class to make sure we're not over capacity, and there's no way to track which members show up regularly."
+  },
+  {
+    "id": "landscaping-quotes",
+    "industry": "Landscaping",
+    "workflow_description": "When a potential customer calls asking for a quote, I have to drive out to see the property, take notes by hand, and then type up a quote later that night. It usually takes two to three days before I can send someone a price."
+  },
+  {
+    "id": "photographer-invoicing",
+    "industry": "Freelance photography",
+    "workflow_description": "After every shoot I manually put together an invoice in Word, email it to the client, and then have to remember to follow up myself if they haven't paid within two weeks. I've lost track of unpaid invoices before."
+  },
+  {
+    "id": "vague-generic",
+    "industry": "Generic/vague",
+    "workflow_description": "Things are pretty manual around here and we waste a lot of time on repetitive stuff. Not sure exactly what to automate first."
+  }
+]
