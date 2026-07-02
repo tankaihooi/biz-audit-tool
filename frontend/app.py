@@ -17,6 +17,13 @@ DIFFICULTY_HELP = {
     "High": "Custom development or nontrivial IT/API integration, weeks to months.",
 }
 
+
+def truncate(text: str, limit: int = 70) -> str:
+    """Shorten to a header-friendly length, breaking on a word boundary."""
+    if len(text) <= limit:
+        return text
+    return text[:limit].rsplit(" ", 1)[0] + "…"
+
 st.set_page_config(page_title="Business Process Audit Tool", page_icon="🔍")
 st.title("Business Process Audit Tool")
 st.caption("Describe a business workflow. Get bottlenecks, AI fixes, and ROI estimates.")
@@ -51,7 +58,8 @@ if st.button("Audit workflow", type="primary"):
 
     st.subheader("Bottlenecks & recommendations")
     for i, b in enumerate(data["bottlenecks"], 1):
-        with st.expander(f"{i}. {b['description']}", expanded=True):
+        with st.expander(f"{i}. {truncate(b['description'])}", expanded=True):
+            st.markdown(b["description"])
             st.markdown("**AI tools:**")
             for tool in b["ai_tools"]:
                 st.markdown(f"- {tool}")
