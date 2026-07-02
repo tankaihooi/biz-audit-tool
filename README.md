@@ -1,13 +1,3 @@
----
-title: Business Process Audit Tool
-emoji: 🔍
-colorFrom: blue
-colorTo: purple
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # Business Process Audit Tool
 
 An SME owner describes their business workflow; the tool returns identified
