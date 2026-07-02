@@ -80,18 +80,18 @@ landscaper, a freelance photographer) shows why:
 | Small/generic (5 cases) | no RAG | 3.80 | 3.40 |
 | Small/generic (5 cases) | RAG | 4.00 | 3.20 |
 
-RAG doesn't just fail to help on the mismatched small-business cases — it
+RAG not only failed to help on the mismatched small-business cases, it
 underperforms even on the cases closest to its own corpus. Reading the raw
-outputs explains why: retrieved context nudges the model toward naming more
+outputs explained why: retrieved context nudged the model toward naming more
 tools per bottleneck, often specific Microsoft Power Platform products
 (Power Automate, AI Builder, Dataverse), rather than fewer, better-targeted
 picks. On `invoice-reentry`, the no-RAG answer named 3 tools; RAG-augmented
 named 7. On `bakery-ordering`, RAG suggested "custom Python scripts using
 libraries like Prophet or ARIMA" where no-RAG suggested off-the-shelf
-"AI-powered inventory management" software — objectively less actionable
+"AI-powered inventory management" software, which is objectively less actionable
 for a non-technical owner, and a direct artifact of grounding a five-person
-bakery's workflow in case studies about enterprise deployments. The lesson
-isn't "RAG doesn't work" — it's that retrieval quality is bounded by corpus
+bakery's workflow in case studies about enterprise deployments. The key takeaway from
+this isn't "RAG doesn't work" however — it's that retrieval quality is bounded by corpus
 relevance, and a corpus of large-company automation stories doesn't
 transfer well to genuinely small businesses even though it's nominally
 about "AI automation case studies." A corpus curated at SME scale would be
@@ -106,7 +106,7 @@ probably the more trustworthy signal here.
 ## What I'd do differently
 - **Curate the RAG corpus for the actual target user, not the nearest available dataset.**
   I built the corpus from Microsoft's published Power Platform case studies because they were
-  well-structured and easy to scrape — but they're enterprise deployment stories, and this tool
+  well-structured and easy to scrape, but they're enterprise deployment stories, and this tool
   is aimed at SMEs. The benchmark caught the mismatch directly: RAG underperformed no-RAG on
   actionability precisely because it kept grounding small-business workflows in enterprise
   tooling. I'd either source or write case studies at the actual scale of the target user before
@@ -127,5 +127,5 @@ probably the more trustworthy signal here.
 - **Sanity-check the LLM judge's calibration.** Relevance scores clustered at 4.9-5.0 across
   nearly every case, which is more consistent with a lenient judge than with genuinely uniform
   quality. I'd add a couple of deliberately weak/irrelevant recommendations to the eval set as a
-  calibration check — if the judge doesn't mark those down clearly, the scale isn't discriminating
+  calibration check. If the judge doesn't mark those down clearly, the scale isn't discriminating
   and the numbers are less trustworthy than they look.
