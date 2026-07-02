@@ -10,6 +10,11 @@ per model/project - not just per minute. This script is resumable: it skips
 cleanly (instead of retrying forever) when it detects the daily cap has been
 hit, so you can just re-run it once the quota resets.
 
+To finish in one sitting instead of waiting for daily resets, set
+GEMINI_API_KEYS to a comma-separated list of keys (each gets its own quota
+bucket) - the script rotates to the next one when the current key taps out.
+Falls back to a single GEMINI_API_KEY if GEMINI_API_KEYS isn't set.
+
 Usage: python -m scripts.benchmark
 """
 
@@ -32,6 +37,14 @@ load_dotenv()
 TEST_CASES_PATH = Path(__file__).resolve().parent.parent / "data" / "eval" / "test_cases.json"
 RESULTS_PATH = Path(__file__).resolve().parent.parent / "data" / "eval" / "benchmark_results.jsonl"
 
+API_KEYS = [
+    k.strip()
+    for k in os.environ.get("GEMINI_API_KEYS", os.environ.get("GEMINI_API_KEY", "")).split(",")
+    if k.strip()
+]
+if not API_KEYS:
+    raise RuntimeError("Set GEMINI_API_KEY or GEMINI_API_KEYS in .env")
+
 VARIANTS = ["api_no_rag", "api"]
 VARIANT_LABELS = {
     "api_no_rag": "Gemini 2.5 Flash (no RAG)",
@@ -42,8 +55,9 @@ VARIANT_LABELS = {
 # from a separate daily quota bucket instead of competing with it.
 JUDGE_MODEL = "gemini-2.5-flash-lite"
 
-MAX_RETRIES = 4
+MAX_RETRIES = 7
 BASE_BACKOFF_SECONDS = 15
+MAX_BACKOFF_SECONDS = 120
 
 
 class DailyQuotaExceeded(Exception):
@@ -70,20 +84,22 @@ description and its generated recommendation, score the recommendation on three 
 grader across cases - reserve 5s for genuinely excellent output."""
 
 
+RETRYABLE_CODES = {429, 500, 503}
+
+
 def call_with_retry(fn, *args, **kwargs):
-    """Retry on rate limits; fail fast (no point backing off) once the daily cap is hit."""
+    """Retry on rate limits and transient server errors; fail fast (no point
+    backing off) once the daily cap is hit."""
     for attempt in range(MAX_RETRIES):
         try:
             return fn(*args, **kwargs)
         except errors.APIError as e:
-            if e.code != 429:
-                raise
-            if "PerDay" in str(e):
+            if e.code == 429 and "PerDay" in str(e):
                 raise DailyQuotaExceeded(str(e)) from e
-            if attempt == MAX_RETRIES - 1:
+            if e.code not in RETRYABLE_CODES or attempt == MAX_RETRIES - 1:
                 raise
-            wait = BASE_BACKOFF_SECONDS * (2**attempt)
-            print(f"    rate limited, retrying in {wait}s...")
+            wait = min(BASE_BACKOFF_SECONDS * (2**attempt), MAX_BACKOFF_SECONDS)
+            print(f"    {e.code} error, retrying in {wait}s...")
             time.sleep(wait)
 
 
@@ -112,38 +128,56 @@ def load_existing_results() -> dict[tuple[str, str], dict]:
     return {(r["case_id"], r["variant"]): r for r in records}
 
 
+def build_clients(key: str) -> tuple[dict, genai.Client]:
+    os.environ["GEMINI_API_KEY"] = key
+    engines = {name: get_engine(name) for name in VARIANTS}
+    return engines, genai.Client(api_key=key)
+
+
 def run() -> None:
     test_cases = json.loads(TEST_CASES_PATH.read_text())
     retriever = get_retriever()
-    judge_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    engines = {name: get_engine(name) for name in VARIANTS}
+
+    key_idx = 0
+    engines, judge_client = build_clients(API_KEYS[key_idx])
 
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     existing = load_existing_results()
     if existing:
         print(f"Resuming: {len(existing)} pairs already scored in {RESULTS_PATH}")
 
-    stopped_early = False
+    keys_exhausted = False
     with RESULTS_PATH.open("a", encoding="utf-8") as out:
         for case in test_cases:
+            if keys_exhausted:
+                break
             pending = [v for v in VARIANTS if (case["id"], v) not in existing]
             if not pending:
                 continue
 
             context = retriever.retrieve(case["workflow_description"])
             for variant in pending:
-                try:
-                    recommendation = call_with_retry(
-                        engines[variant].generate, case["workflow_description"], context
-                    )
-                    score = judge(judge_client, case["workflow_description"], recommendation)
-                except DailyQuotaExceeded:
-                    print(
-                        "\nHit the free-tier daily request cap. Progress is saved - "
-                        "re-run `python -m scripts.benchmark` after the quota resets "
-                        "(see https://ai.dev/rate-limit) to pick up where this left off."
-                    )
-                    stopped_early = True
+                recommendation = score = None
+                while True:
+                    try:
+                        recommendation = call_with_retry(
+                            engines[variant].generate, case["workflow_description"], context
+                        )
+                        score = judge(judge_client, case["workflow_description"], recommendation)
+                        break
+                    except DailyQuotaExceeded:
+                        key_idx += 1
+                        if key_idx >= len(API_KEYS):
+                            print(
+                                "\nAll API keys hit today's daily cap. Progress is saved - "
+                                "re-run `python -m scripts.benchmark` once more quota is "
+                                "available to pick up where this left off."
+                            )
+                            keys_exhausted = True
+                            break
+                        print(f"    key {key_idx} exhausted, rotating to key {key_idx + 1}/{len(API_KEYS)}...")
+                        engines, judge_client = build_clients(API_KEYS[key_idx])
+                if keys_exhausted:
                     break
 
                 record = {
@@ -160,12 +194,12 @@ def run() -> None:
                     f"  {case['id']:<22} {variant:<12} "
                     f"rel={score.relevance} spec={score.specificity} act={score.actionability}"
                 )
-            if stopped_early:
+            if keys_exhausted:
                 break
 
     total_pairs = len(test_cases) * len(VARIANTS)
     print(f"\n{len(existing)}/{total_pairs} pairs scored.")
-    if len(existing) < total_pairs and not stopped_early:
+    if len(existing) < total_pairs and not keys_exhausted:
         print("Some pairs are still missing - re-run the script to fill them in.")
     print_summary(list(existing.values()))
 
