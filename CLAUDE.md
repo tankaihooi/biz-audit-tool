@@ -42,7 +42,7 @@ through the interface.
 
 ## Build order (current status)
 1. [x] Walking skeleton: Streamlit -> FastAPI -> hardcoded Recommendation (StubEngine)
-2. [ ] RAG: ingest/chunk case studies, embed, ChromaDB, test retrieval
+2. [x] RAG: ingest/chunk case studies, embed, ChromaDB, test retrieval
 3. [ ] ApiEngine: real API model with retrieved context, forced structured output
 4. [ ] QLoRA fine-tuning on Kaggle -> FinetunedEngine (swappable backend)
 5. [ ] Benchmark: API vs fine-tuned vs fine-tuned+RAG on a 20-case rubric
