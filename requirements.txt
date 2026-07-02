@@ -11,7 +11,3 @@ requests>=2.32
 # --- RAG ---
 chromadb>=0.5
 sentence-transformers>=3.0
-
-# NOTE: fine-tuning deps (transformers, peft, bitsandbytes, trl, accelerate)
-# are NOT here on purpose. Install those in the Kaggle notebook environment only,
-# so this app image stays small and deployable on Hugging Face Spaces.

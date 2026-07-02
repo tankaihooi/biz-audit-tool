@@ -1,7 +1,7 @@
 """Every model variant lives behind this one interface.
 
-Vanilla API, fine-tuned, and fine-tuned+RAG are all just RecommendationEngine
-implementations. This is what makes the Week-4 benchmark a for-loop.
+API-with-RAG and API-without-RAG are both just RecommendationEngine
+implementations. This is what makes the benchmark a for-loop.
 """
 
 import os
@@ -43,31 +43,21 @@ class StubEngine(RecommendationEngine):
 
 
 class ApiEngine(RecommendationEngine):
-    """Baseline: a frontier API model prompted with retrieved context.
+    """A frontier API model, optionally prompted with retrieved context.
+
+    Set use_rag=False to benchmark the model against its own RAG-augmented
+    output (the 'no-RAG' baseline).
 
     TODO(step 3): call the API, force JSON matching the Recommendation schema,
     validate with Recommendation.model_validate_json before returning.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, use_rag: bool = True) -> None:
         self.api_key = os.environ["LLM_API_KEY"]
-
-    def generate(self, query: str, context: list[str]) -> Recommendation:
-        raise NotImplementedError("Implement in step 3.")
-
-
-class FinetunedEngine(RecommendationEngine):
-    """QLoRA fine-tuned model loaded locally (or served).
-
-    TODO(step 4): load base model + LoRA adapter, run inference, parse to schema.
-    Set use_rag=True to prepend retrieved context (the 'fine-tuned + RAG' variant).
-    """
-
-    def __init__(self, use_rag: bool = False) -> None:
         self.use_rag = use_rag
 
     def generate(self, query: str, context: list[str]) -> Recommendation:
-        raise NotImplementedError("Implement in step 4.")
+        raise NotImplementedError("Implement in step 3.")
 
 
 def get_engine(name: str | None = None) -> RecommendationEngine:
@@ -75,7 +65,6 @@ def get_engine(name: str | None = None) -> RecommendationEngine:
     name = name or os.getenv("ENGINE", "stub")
     return {
         "stub": StubEngine,
-        "api": ApiEngine,
-        "finetuned": lambda: FinetunedEngine(use_rag=False),
-        "finetuned_rag": lambda: FinetunedEngine(use_rag=True),
+        "api": lambda: ApiEngine(use_rag=True),
+        "api_no_rag": lambda: ApiEngine(use_rag=False),
     }[name]()

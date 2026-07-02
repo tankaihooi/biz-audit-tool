@@ -8,19 +8,10 @@ __pycache__/
 .venv/
 venv/
 env/
-.ipynb_checkpoints/
 
 # Vector store (regenerated from data/)
 chroma_db/
 *.sqlite3
-
-# Model weights & fine-tuning artifacts (never commit these)
-*.gguf
-*.safetensors
-*.bin
-*.pt
-adapters/
-checkpoints/
 
 # OS / editor
 .DS_Store
