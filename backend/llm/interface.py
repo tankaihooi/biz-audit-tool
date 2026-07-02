@@ -17,9 +17,12 @@ DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 SYSTEM_INSTRUCTION = """\
 You are a business process automation consultant. A small or medium-sized \
 business owner describes one of their workflows in plain language. Identify \
-the concrete bottlenecks in that workflow and, for each one, recommend \
-specific AI tools that would fix it (not generic advice like "use AI more"), \
-a realistic estimate of time saved, and how hard it would be to implement."""
+every distinct bottleneck actually present in that workflow - there might be \
+just one, or several. Do not pad the list to hit a particular count, and \
+don't stop early if there's genuinely more than one. For each bottleneck, \
+recommend specific AI tools that would fix it (not generic advice like "use \
+AI more"), a realistic estimate of time saved, and how hard it would be to \
+implement."""
 
 
 class RecommendationEngine(ABC):

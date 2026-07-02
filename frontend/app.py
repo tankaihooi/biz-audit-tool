@@ -10,6 +10,13 @@ import streamlit as st
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
+DIFFICULTY_COLOR = {"Low": "green", "Medium": "orange", "High": "red"}
+DIFFICULTY_HELP = {
+    "Low": "Off-the-shelf/no-code tools, days, no developer needed.",
+    "Medium": "Some integration or configuration work, days to weeks.",
+    "High": "Custom development or nontrivial IT/API integration, weeks to months.",
+}
+
 st.set_page_config(page_title="Business Process Audit Tool", page_icon="🔍")
 st.title("Business Process Audit Tool")
 st.caption("Describe a business workflow. Get bottlenecks, AI fixes, and ROI estimates.")
@@ -48,4 +55,9 @@ if st.button("Audit workflow", type="primary"):
             st.markdown(f"**AI tools:** {', '.join(b['ai_tools'])}")
             col1, col2 = st.columns(2)
             col1.metric("Est. time saved", b["estimated_time_saved"])
-            col2.metric("Implementation", b["implementation_difficulty"])
+
+            difficulty = b["implementation_difficulty"]
+            color = DIFFICULTY_COLOR.get(difficulty, "gray")
+            col2.markdown("**Implementation**")
+            col2.markdown(f":{color}[**{difficulty}**]")
+            col2.caption(DIFFICULTY_HELP.get(difficulty, ""))

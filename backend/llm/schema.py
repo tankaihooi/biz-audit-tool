@@ -20,7 +20,14 @@ class Bottleneck(BaseModel):
     estimated_time_saved: str = Field(
         ..., description="Human-readable estimate, e.g. '4-6 hours/week'."
     )
-    implementation_difficulty: Difficulty
+    implementation_difficulty: Difficulty = Field(
+        ...,
+        description=(
+            "Low: off-the-shelf/no-code tools, days, no developer needed. "
+            "Medium: some integration or configuration work, days to weeks. "
+            "High: custom development or nontrivial IT/API integration, weeks to months."
+        ),
+    )
 
 
 class Recommendation(BaseModel):
